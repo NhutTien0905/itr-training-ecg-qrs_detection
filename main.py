@@ -76,7 +76,7 @@ def train_model(model, batch_size=128, epoch=3):
                     validation_data=valid_data,
                     callbacks=callback,
                     )
-        model.save(SAVE_MODEL_DIR + TEST_TIME)
+        model.save(SAVE_MODEL_DIR + TEST_TIME + '/model_run-0.h5')
 
 
 def get_result(result_file_name, checkpoint=True, checkpoint_epoch=0, saved_model_name=None, batch_size=128):
@@ -89,6 +89,7 @@ def get_result(result_file_name, checkpoint=True, checkpoint_epoch=0, saved_mode
         if checkpoint:
             model = get_qrs_model()
             model.load_weights(CHECK_POINT_DIR + TEST_TIME + "/0{}.weights.h5".format(checkpoint_epoch))
+            model.save(SAVE_MODEL_DIR + TEST_TIME + '/model_run-0.h5')
             print('Load model checkpoint')
         else:
             model = tf.keras.models.load_model(SAVE_MODEL_DIR + saved_model_name)
@@ -163,6 +164,6 @@ def get_result_ec57():
 
 if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
-    train_model(get_qrs_model(), epoch=10)
+    # train_model(get_qrs_model(), epoch=10)
     get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
     # get_result_ec57()
