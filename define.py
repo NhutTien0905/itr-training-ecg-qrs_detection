@@ -10,7 +10,8 @@ RESULT_DIR = PROJECT_DIR + 'result/' + DATABASE
 
 
 LTDB_DIR = '/media/dev7/Data_1/Dataset/ltdb/'
-MITDB_DIR = '/home/tien/Documents/ITR/mit-bih-arrhythmia-database-1.0.0/'
+# MITDB_DIR = '/home/tien/Documents/ITR/mit-bih-arrhythmia-database-1.0.0/'
+MITDB_DIR = '/kaggle/input/mitbih2/mit-bih-arrhythmia-database-1.0.0/'
 AHADB_DIR = '/media/dev7/Data_1/Dataset/ahadb/'
 ESCDB_DIR = '/media/dev7/Data_1/Dataset/escdb/'
 NSTDB_DIR = '/media/dev7/Data_1/Dataset/nstdb/'
