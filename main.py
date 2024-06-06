@@ -164,6 +164,6 @@ def get_result_ec57():
 
 if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
-    # train_model(get_qrs_model(), epoch=10)
+    train_model(get_qrs_model(), epoch=3)
     get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
     # get_result_ec57()
