@@ -16,7 +16,7 @@ physical_devices = tf.config.list_physical_devices('GPU')
 
 def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9):
     cnn_model = tf.keras.models.Sequential()
-    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='valid', activation='relu',
+    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu',
                                          input_shape=(input_shape, 1), data_format="channels_last", ))
     cnn_model.add(tf.keras.layers.Dropout(0.5))
     cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
@@ -166,4 +166,4 @@ if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
     train_model(get_qrs_model(), epoch=3)
     get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
-    # get_result_ec57()
+    get_result_ec57()
