@@ -16,7 +16,7 @@ AHADB_DIR = '/media/dev7/Data_1/Dataset/ahadb/'
 ESCDB_DIR = '/media/dev7/Data_1/Dataset/escdb/'
 NSTDB_DIR = '/media/dev7/Data_1/Dataset/nstdb/'
 
-PREPROCESSED_DATA_DIR = '/kaggle/input/mitbih-tfrecord/preprocessed_v2/' + DATABASE
+PREPROCESSED_DATA_DIR = '/kaggle/input/mitbih-tfrecord-2/preprocessed_v3/' + DATABASE
 CHECK_POINT_DIR = '/kaggle/working/checkpoint/' + DATABASE
 
 FREQUENCY_SAMPLING = 360
