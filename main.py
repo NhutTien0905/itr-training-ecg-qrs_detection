@@ -44,6 +44,7 @@ def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9
     cnn_model.add(tf.keras.layers.Dropout(0.5))
     cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
     cnn_model.add(SliceLayer())
+    print("cc")
     cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu'))
     cnn_model.add(tf.keras.layers.Dropout(0.5))
     cnn_model.add(tf.keras.layers.Flatten())
