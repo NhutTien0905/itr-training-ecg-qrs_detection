@@ -70,7 +70,7 @@ class SliceLayer(tf.keras.layers.Layer):
         # Define the start index and size for the slice
         # This example slices the last element along the time dimension
         start_index = [0, shape[1] - 1, 0]
-        size = [shape[0], 1, shape[2]]  # Correcting size to keep one time step
+        size = [shape[0], shape[1] - 1, shape[2]]  # Correcting size to keep one time step
 
         # Apply tf.slice to the inputs
         sliced = tf.slice(inputs, start_index, size)
