@@ -81,7 +81,7 @@ class SliceLayer(tf.keras.layers.Layer):
 def custom_padding(x, padding_size):
     return tf.pad(x, [[0, 0], [padding_size, padding_size], [0, 0]])
 
-def get_qrs_model(input_shape=(None, 1), learning_rate=0.005, momentum=0.9):
+def get_qrs_model(input_shape=(NEIGHBOUR_POINT, 1), learning_rate=0.005, momentum=0.9):
     # Define the input layer
     inputs = tf.keras.Input(shape=input_shape)
     
