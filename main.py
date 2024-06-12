@@ -81,45 +81,41 @@ class SliceLayer(tf.keras.layers.Layer):
 def custom_padding(x, padding_size):
     return tf.pad(x, [[0, 0], [padding_size, padding_size], [0, 0]])
 
-def get_qrs_model(input_shape=(NEIGHBOUR_POINT, 1), learning_rate=0.005, momentum=0.9):
+def get_qrs_model(input_shape=(145, 1), learning_rate=0.005, momentum=0.9):
     # Define the input layer
     inputs = tf.keras.Input(shape=input_shape)
-    
+    x = tf.keras.layers.Lambda(custom_padding, arguments={'padding_size': 1})(inputs)
+
     # First Conv1D layer
-    x = tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu', data_format="channels_last")(inputs)
-    
-    # Custom padding layer
-    x = tf.keras.layers.Lambda(custom_padding, arguments={'padding_size': 1})(x)
-    
-    # Dropout layer
+    x = tf.keras.layers.Conv1D(32, kernel_size=5, activation='relu', data_format="channels_last")(x)
     x = tf.keras.layers.Dropout(0.5)(x)
-    
+
     # MaxPooling1D layer
-    x = tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same')(x)
-    
-    # Custom Slice layer
+    x = tf.keras.layers.MaxPooling1D(pool_size=3, strides=2)(x)
+
+    # Apply the custom slicing layer
     x = SliceLayer()(x)
-    
-    # Second Conv1D layer
-    x = tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu')(x)
-    
-    # Dropout layer
+
+    # Second Conv1D layer with kernel size 1
+    x = tf.keras.layers.Conv1D(32, kernel_size=5, activation='relu')(x)
     x = tf.keras.layers.Dropout(0.5)(x)
-    
+
     # Flatten layer
     x = tf.keras.layers.Flatten()(x)
-    
+
     # Dense and Dropout layers
     x = tf.keras.layers.Dense(1024, activation='relu')(x)
     x = tf.keras.layers.Dropout(0.5)(x)
     x = tf.keras.layers.Dense(512, activation='relu')(x)
     x = tf.keras.layers.Dropout(0.5)(x)
+
     
     # Output layer
     outputs = tf.keras.layers.Dense(2, activation='softmax')(x)
     
     # Create the model
     model = tf.keras.Model(inputs=inputs, outputs=outputs)
+#     model.summary()
     
     # Compile the model
     optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
