@@ -36,93 +36,92 @@ physical_devices = tf.config.list_physical_devices('GPU')
 #     return tf.pad(x, [[0, 0], [padding_size, padding_size], [0, 0]])
 
 
-# def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9):
-#     cnn_model = tf.keras.models.Sequential()
-#     cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu',
-#                                          input_shape=(input_shape, 1), data_format="channels_last", ))
-#     cnn_model.add(tf.keras.layers.Lambda(custom_padding, arguments={'padding_size': 1}))
-#     cnn_model.add(tf.keras.layers.Dropout(0.5))
-#     cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
-#     cnn_model.add(SliceLayer())
-#     print("cc")
-#     cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu'))
-#     cnn_model.add(tf.keras.layers.Dropout(0.5))
-#     cnn_model.add(tf.keras.layers.Flatten())
-#     cnn_model.add(tf.keras.layers.Dense(1024, activation='relu'))
-#     cnn_model.add(tf.keras.layers.Dropout(0.5))
-#     cnn_model.add(tf.keras.layers.Dense(512, activation='relu'))
-#     cnn_model.add(tf.keras.layers.Dropout(0.5))
-#     cnn_model.add(tf.keras.layers.Dense(2, activation='softmax'))
-#     # cnn_model.summary()
-#     optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
-#     loss = tf.keras.losses.binary_crossentropy
-#     cnn_model.compile(optimizer, loss=loss, metrics=['accuracy'])
-
-#     return cnn_model
-class SliceLayer(tf.keras.layers.Layer):
-    def __init__(self, **kwargs):
-        super(SliceLayer, self).__init__(**kwargs)
-
-    def call(self, inputs):
-        # Get the shape of the tensor from the inputs
-        shape = tf.shape(inputs)
-
-        # Define the start index and size for the slice
-        # This example slices the last element along the time dimension
-        start_index = [0, shape[1] - 1, 0]
-        size = [shape[0], shape[1] - 1, shape[2]]  # Correcting size to keep one time step
-
-        # Apply tf.slice to the inputs
-        sliced = tf.slice(inputs, start_index, size)
-
-        # Ensure the output has the shape (batch_size, 1, features)
-        return sliced
-    
-def custom_padding(x, padding_size):
-    return tf.pad(x, [[0, 0], [padding_size, padding_size], [0, 0]])
-
-def get_qrs_model(input_shape=(145, 1), learning_rate=0.005, momentum=0.9):
-    # Define the input layer
-    inputs = tf.keras.Input(shape=input_shape)
-    x = tf.keras.layers.Lambda(custom_padding, arguments={'padding_size': 1})(inputs)
-
-    # First Conv1D layer
-    x = tf.keras.layers.Conv1D(32, kernel_size=5, activation='relu', data_format="channels_last")(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
-
-    # MaxPooling1D layer
-    x = tf.keras.layers.MaxPooling1D(pool_size=3, strides=2)(x)
-
-    # Apply the custom slicing layer
-    x = SliceLayer()(x)
-
-    # Second Conv1D layer with kernel size 1
-    x = tf.keras.layers.Conv1D(32, kernel_size=5, activation='relu')(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
-
-    # Flatten layer
-    x = tf.keras.layers.Flatten()(x)
-
-    # Dense and Dropout layers
-    x = tf.keras.layers.Dense(1024, activation='relu')(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
-    x = tf.keras.layers.Dense(512, activation='relu')(x)
-    x = tf.keras.layers.Dropout(0.5)(x)
-
-    
-    # Output layer
-    outputs = tf.keras.layers.Dense(2, activation='softmax')(x)
-    
-    # Create the model
-    model = tf.keras.Model(inputs=inputs, outputs=outputs)
-#     model.summary()
-    
-    # Compile the model
+def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9):
+    cnn_model = tf.keras.models.Sequential()
+    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='valid', activation='relu',
+                                         input_shape=(input_shape, 1), data_format="channels_last", ))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
+    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Flatten())
+    cnn_model.add(tf.keras.layers.Dense(1024, activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dense(512, activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dense(2, activation='softmax'))
+    # cnn_model.summary()
     optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
     loss = tf.keras.losses.binary_crossentropy
-    model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    cnn_model.compile(optimizer, loss=loss, metrics=['accuracy'])
+
+    return cnn_model
+
+    return cnn_model
+# class SliceLayer(tf.keras.layers.Layer):
+#     def __init__(self, **kwargs):
+#         super(SliceLayer, self).__init__(**kwargs)
+
+#     def call(self, inputs):
+#         # Get the shape of the tensor from the inputs
+#         shape = tf.shape(inputs)
+
+#         # Define the start index and size for the slice
+#         # This example slices the last element along the time dimension
+#         start_index = [0, shape[1] - 1, 0]
+#         size = [shape[0], shape[1] - 1, shape[2]]  # Correcting size to keep one time step
+
+#         # Apply tf.slice to the inputs
+#         sliced = tf.slice(inputs, start_index, size)
+
+#         # Ensure the output has the shape (batch_size, 1, features)
+#         return sliced
     
-    return model
+# def custom_padding(x, padding_size):
+#     return tf.pad(x, [[0, 0], [padding_size, padding_size], [0, 0]])
+
+# def get_qrs_model(input_shape=(145, 1), learning_rate=0.005, momentum=0.9):
+#     # Define the input layer
+#     inputs = tf.keras.Input(shape=input_shape)
+#     x = tf.keras.layers.Lambda(custom_padding, arguments={'padding_size': 1})(inputs)
+
+#     # First Conv1D layer
+#     x = tf.keras.layers.Conv1D(32, kernel_size=5, activation='relu', data_format="channels_last")(x)
+#     x = tf.keras.layers.Dropout(0.5)(x)
+
+#     # MaxPooling1D layer
+#     x = tf.keras.layers.MaxPooling1D(pool_size=3, strides=2)(x)
+
+#     # Apply the custom slicing layer
+#     x = SliceLayer()(x)
+
+#     # Second Conv1D layer with kernel size 1
+#     x = tf.keras.layers.Conv1D(32, kernel_size=5, activation='relu')(x)
+#     x = tf.keras.layers.Dropout(0.5)(x)
+
+#     # Flatten layer
+#     x = tf.keras.layers.Flatten()(x)
+
+#     # Dense and Dropout layers
+#     x = tf.keras.layers.Dense(1024, activation='relu')(x)
+#     x = tf.keras.layers.Dropout(0.5)(x)
+#     x = tf.keras.layers.Dense(512, activation='relu')(x)
+#     x = tf.keras.layers.Dropout(0.5)(x)
+
+    
+#     # Output layer
+#     outputs = tf.keras.layers.Dense(2, activation='softmax')(x)
+    
+#     # Create the model
+#     model = tf.keras.Model(inputs=inputs, outputs=outputs)
+# #     model.summary()
+    
+#     # Compile the model
+#     optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
+#     loss = tf.keras.losses.binary_crossentropy
+#     model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    
+#     return model
 
 
 def train_model(model, batch_size=128, epoch=3):
