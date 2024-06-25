@@ -158,7 +158,7 @@ def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9
 #     return model
 
 
-def train_model(model, batch_size=128, epoch=3):
+def train_model(model, batch_size=128, epoch=1):
     if os.path.exists(SAVE_MODEL_DIR + TEST_TIME):
         print("Model %s was trained and are ready" % TEST_TIME)
         return
@@ -286,6 +286,6 @@ def get_result_ec57():
 
 if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
-    train_model(get_qrs_model(), epoch=3)
-    get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
+    train_model(get_qrs_model(), epoch=1)
+    get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=1, saved_model_name='run-0')
     # get_result_ec57()
