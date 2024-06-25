@@ -9,46 +9,68 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 from ec57_test import ec57_eval
 from multiprocessing import Pool
 
-import tensorflow as tf
-
-class QRSModel(tf.keras.Model):
-    def __init__(self, input_shape=256, learning_rate=0.005, momentum=0.9):
-        super(QRSModel, self).__init__()
-        self.conv1 = tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='valid', activation='relu', input_shape=(input_shape, 1), data_format="channels_last")
-        self.dropout1 = tf.keras.layers.Dropout(0.5)
-        self.maxpool1 = tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same')
-        self.conv2 = tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu')
-        self.dropout2 = tf.keras.layers.Dropout(0.5)
-        self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(1024, activation='relu')
-        self.dropout3 = tf.keras.layers.Dropout(0.5)
-        self.dense2 = tf.keras.layers.Dense(512, activation='relu')
-        self.dropout4 = tf.keras.layers.Dropout(0.5)
-        self.dense3 = tf.keras.layers.Dense(2, activation='softmax')
-
-        self.optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
-        self.loss_fn = tf.keras.losses.BinaryCrossentropy()
-        self.compile(optimizer=self.optimizer, loss=self.loss_fn, metrics=['accuracy'])
-
-    def call(self, inputs):
-        x = self.conv1(inputs)
-        x = self.dropout1(x)
-        x = self.maxpool1(x)
-        x = self.conv2(x)
-        x = self.dropout2(x)
-        x = self.flatten(x)
-        x = self.dense1(x)
-        x = self.dropout3(x)
-        x = self.dense2(x)
-        x = self.dropout4(x)
-        return self.dense3(x)
-
-def get_qrs_model(input_shape=256, learning_rate=0.005, momentum=0.9):
-    return QRSModel(input_shape=input_shape, learning_rate=learning_rate, momentum=momentum)
-
 physical_devices = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
+# class QRSModel(tf.keras.Model):
+#     def __init__(self, input_shape=256, learning_rate=0.005, momentum=0.9):
+#         super(QRSModel, self).__init__()
+#         self.conv1 = tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='valid', activation='relu', input_shape=(input_shape, 1), data_format="channels_last")
+#         self.dropout1 = tf.keras.layers.Dropout(0.5)
+#         self.maxpool1 = tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same')
+#         self.conv2 = tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu')
+#         self.dropout2 = tf.keras.layers.Dropout(0.5)
+#         self.flatten = tf.keras.layers.Flatten()
+#         self.dense1 = tf.keras.layers.Dense(1024, activation='relu')
+#         self.dropout3 = tf.keras.layers.Dropout(0.5)
+#         self.dense2 = tf.keras.layers.Dense(512, activation='relu')
+#         self.dropout4 = tf.keras.layers.Dropout(0.5)
+#         self.dense3 = tf.keras.layers.Dense(2, activation='softmax')
+
+#         self.optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
+#         self.loss_fn = tf.keras.losses.BinaryCrossentropy()
+#         self.compile(optimizer=self.optimizer, loss=self.loss_fn, metrics=['accuracy'])
+
+#     def call(self, inputs):
+#         x = self.conv1(inputs)
+#         x = self.dropout1(x)
+#         x = self.maxpool1(x)
+#         x = self.conv2(x)
+#         x = self.dropout2(x)
+#         x = self.flatten(x)
+#         x = self.dense1(x)
+#         x = self.dropout3(x)
+#         x = self.dense2(x)
+#         x = self.dropout4(x)
+#         return self.dense3(x)
+
+# def get_qrs_model(input_shape=256, learning_rate=0.005, momentum=0.9):
+#     return QRSModel(input_shape=input_shape, learning_rate=learning_rate, momentum=momentum)
+
+
+# conv1d
+def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9):
+    cnn_model = tf.keras.models.Sequential()
+    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='valid', activation='relu',
+                                         input_shape=(input_shape, 1), data_format="channels_last", ))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
+    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Flatten())
+    cnn_model.add(tf.keras.layers.Dense(1024, activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dense(512, activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dense(2, activation='softmax'))
+    # cnn_model.summary()
+    optimizer = tf.keras.optimizers.legacy.SGD(learning_rate=learning_rate, momentum=momentum)
+    loss = tf.keras.losses.binary_crossentropy
+    cnn_model.compile(optimizer, loss=loss, metrics=['accuracy'])
+
+    return cnn_model
+
+# conv2d
 # def get_qrs_model(input_shape=(145, 1, 1), learning_rate=0.005, momentum=0.9):
 #     cnn_model = tf.keras.models.Sequential()
 #     cnn_model.add(tf.keras.layers.Conv2D(filters=32, kernel_size=(3, 1), padding='valid', activation='relu',
@@ -64,7 +86,7 @@ physical_devices = tf.config.list_physical_devices('GPU')
 #     cnn_model.add(tf.keras.layers.Dropout(0.5))
 #     cnn_model.add(tf.keras.layers.Dense(2, activation='softmax'))
 
-#     optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
+#     optimizer = tf.keras.optimizers.legacy.SGD(learning_rate=learning_rate, momentum=momentum)
 #     loss = tf.keras.losses.binary_crossentropy
 #     cnn_model.compile(optimizer, loss=loss, metrics=['accuracy'])
 
@@ -264,6 +286,6 @@ def get_result_ec57():
 
 if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
-    train_model(get_qrs_model(input_shape=145), epoch=3)
+    train_model(get_qrs_model(), epoch=3)
     get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
     # get_result_ec57()
