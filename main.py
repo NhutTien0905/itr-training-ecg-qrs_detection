@@ -8,6 +8,7 @@ import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 from ec57_test import ec57_eval
 from multiprocessing import Pool
+tf.compat.v1.disable_eager_execution()
 
 physical_devices = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -64,7 +65,7 @@ def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9
     cnn_model.add(tf.keras.layers.Dropout(0.5))
     cnn_model.add(tf.keras.layers.Dense(2, activation='softmax'))
     # cnn_model.summary()
-    optimizer = tf.keras.optimizers.legacy.SGD(learning_rate=learning_rate, momentum=momentum)
+    optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
     loss = tf.keras.losses.binary_crossentropy
     cnn_model.compile(optimizer, loss=loss, metrics=['accuracy'])
 
