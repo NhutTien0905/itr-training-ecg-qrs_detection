@@ -8,7 +8,7 @@ import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 from ec57_test import ec57_eval
 from multiprocessing import Pool
-tf.compat.v1.disable_eager_execution()
+# tf.compat.v1.disable_eager_execution()
 
 physical_devices = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -288,5 +288,5 @@ def get_result_ec57():
 if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
     train_model(get_qrs_model(), epoch=1)
-    get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=1, saved_model_name='run-0')
+    get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
     # get_result_ec57()
