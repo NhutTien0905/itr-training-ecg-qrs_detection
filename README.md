@@ -115,7 +115,7 @@ sudo docker run hello-world
 ```
 
 # II. Convert model and Compare with .h5 version
-### 1. Convert model
+### Convert model
 ```python
 import os
 import tensorflow as tf
@@ -168,7 +168,47 @@ if __name__ == '__main__':
     model_dir = ''
     main("save/model/path")
 ```
-### 2. Compare result
+Configuration:
+```python
+TF_CONFIG = {
+    'model_name': 'qrs',
+    'signature': 'channels',
+    'input': 'input',
+    'output': 'prediction',
+}
+```
+`model_name: qrs`: This key-value pair specifies the name of the model. In this case, the model is named `qrs`.
+
+`signature: channels`: This indicates the signature of the model. In TensorFlow, a signature defines the inputs and outputs of a model. Here, `channels` could refer to a specific type of model signature that is expected to handle data with multiple channels, possibly related to images or time-series data.
+
+`input: input`: This specifies the name of the input node or tensor for the model. The model expects its input to be provided under the name `input`.
+
+`output: prediction`: This specifies the name of the output node or tensor for the model. The model will provide its predictions under the name `prediction`.
+
+After run this code, we will have a folder like this:
+- save/model/path/
+  - 1/
+    - assets/
+    - saved_model.pb
+    - fingerprint.pb
+    - variables/
+        - variables.data-00000-of-00001
+        - variables.index
+  - .../
+
+`assets`: This directory is used to store auxiliary files. These could be any additional assets required by the model, such as vocabularies, label maps, or external files needed during the model's inference.
+
+`saved_model.pb`: This is the protobuf file that contains the actual TensorFlow model. It includes the model architecture, training configuration, and other metadata.
+
+`fingerprint.pb`: This file contains a fingerprint of the model, which is used for versioning and ensuring the integrity of the model files. It helps in verifying that the model has not been altered.
+
+`variables`: This directory contains the variable files for the model. Variables represent the weights and biases of the model, which are learned during training.
+
+`variables.data-00000-of-00001`: This file stores the actual values of the variables (weights and biases). If the model is large, the variables might be split into multiple files (hence the numbering).
+
+`variables.index`: This file is an index for the variable shards (like `variables.data-00000-of-00001`). It helps TensorFlow to locate and load the variable shards correctly.
+
+We can have multiple versions of model on TFServer.
 
 # III. Import model
 ### 1. Load docker image
@@ -200,6 +240,10 @@ model_config_list: {
   }
 }
 EOL
+```
+In `model_config.txt`, We define model's name, path to model in Docker container, and framework we are using.
+
+```bash
 touch batching_parameters.txt
 cat > batching_parameters << EOL
 max_batch_size { value: 1024 }
@@ -208,6 +252,14 @@ num_batch_threads { value: 12 }
 pad_variable_length_inputs: true
 EOL
 ```
+`max_batch_size { value: 1024 }`: This sets the maximum number of requests that can be batched together into a single batch.
+
+`batch_timeout_micros { value: 1000 }`: This sets the maximum amount of time (in microseconds) to wait for forming a batch. If the batch is not full, it will be processed after this timeout.
+
+`num_batch_threads { value: 12 }`: This specifies the number of threads dedicated to processing batches.
+
+`pad_variable_length_inputs: true`: This indicates whether variable-length inputs should be padded to ensure they have the same length within a batch.
+
 - Copy to TFServer
 ```bash
 sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new/1 tf-gpu2:/tensorflow-serving/qrs_model
