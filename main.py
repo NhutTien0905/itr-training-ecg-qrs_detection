@@ -54,15 +54,15 @@ def get_qrs_model(input_shape=NEIGHBOUR_POINT, learning_rate=0.005, momentum=0.9
     cnn_model = tf.keras.models.Sequential()
     cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=3, padding='valid', activation='relu',
                                          input_shape=(input_shape, 1), data_format="channels_last", ))
-    # cnn_model.add(tf.keras.layers.Dropout(0.5))
-    # cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
-    # cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu'))
-    # cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.MaxPool1D(pool_size=3, strides=2, padding='same'))
+    cnn_model.add(tf.keras.layers.Conv1D(filters=32, kernel_size=5, padding='valid', activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
     cnn_model.add(tf.keras.layers.Flatten())
-    # cnn_model.add(tf.keras.layers.Dense(1024, activation='relu'))
-    # cnn_model.add(tf.keras.layers.Dropout(0.5))
-    # cnn_model.add(tf.keras.layers.Dense(512, activation='relu'))
-    # cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dense(1024, activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
+    cnn_model.add(tf.keras.layers.Dense(512, activation='relu'))
+    cnn_model.add(tf.keras.layers.Dropout(0.5))
     cnn_model.add(tf.keras.layers.Dense(2, activation='softmax'))
     # cnn_model.summary()
     optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate, momentum=momentum)
@@ -240,7 +240,7 @@ def get_result(result_file_name, checkpoint=True, checkpoint_epoch=0, saved_mode
 def multi_predict(file_path, dataset, checkpoint=True, checkpoint_epoch=3, saved_model_name=None, batch_size=128):
     if checkpoint:
         model = get_qrs_model()
-        model.load_weights(CHECK_POINT_DIR + TEST_TIME + "/0{}.weights.h5".format(checkpoint_epoch))
+        model.load_weights(CHECK_POINT_DIR + TEST_TIME + "/0{}.ckpt".format(checkpoint_epoch))
         print('Load model checkpoint')
     else:
         model = tf.keras.models.load_model(SAVE_MODEL_DIR + saved_model_name)
@@ -287,6 +287,6 @@ def get_result_ec57():
 
 if __name__ == '__main__':
     # generate_data(get_record_raw(MITDB_DIR), None)
-    train_model(get_qrs_model(), epoch=1)
+    train_model(get_qrs_model(), epoch=3)
     get_result(TEST_TIME, checkpoint=True, checkpoint_epoch=3, saved_model_name='run-0')
     # get_result_ec57()
