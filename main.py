@@ -187,7 +187,7 @@ def train_model(model, batch_size=128, epoch=1):
     check_point_dir = CHECK_POINT_DIR + TEST_TIME + '/'
     if not os.path.exists(check_point_dir):
         os.mkdir(check_point_dir)
-    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=check_point_dir + "{epoch:02d}.weights.h5",
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=check_point_dir + "{epoch:02d}.ckpt",
                                                     save_weights_only=True, verbose=0, save_freq='epoch')
     callback = [
         tensorboard,
@@ -211,7 +211,7 @@ def get_result(result_file_name, checkpoint=True, checkpoint_epoch=0, saved_mode
         prefetch_buffer = batch_size * 100
         if checkpoint:
             model = get_qrs_model()
-            model.load_weights(CHECK_POINT_DIR + TEST_TIME + "/0{}.weights.h5".format(checkpoint_epoch))
+            model.load_weights(CHECK_POINT_DIR + TEST_TIME + "/0{}.ckpt".format(checkpoint_epoch))
             model.save(SAVE_MODEL_DIR + TEST_TIME + '/model_run-0.h5')
             print('Load model checkpoint')
         else:
