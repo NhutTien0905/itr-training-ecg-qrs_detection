@@ -1,15 +1,15 @@
 # I. Setup environment
 ### 1. Install libraries
-- Install tensorflow 2.16.1
+- Install tensorflow 2.13.1
 ```bash
-pip install tensorflow==2.16.1
+pip install tensorflow==2.13.1
 pip install tensorflow-serving-api
 ```
 - Install grpc
 ```bash
 pip install grpcio
 ```
-### 2. Install CUDA 12.3 and CUDNN 8.9
+### 2. Install CUDA 11.8 and CUDNN 8.6
 - To verify your gpu is cuda enable check
 ```bash
 lspci | grep -i nvidia
@@ -59,28 +59,28 @@ sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
-- Installing CUDA-12.3
+- Installing CUDA-11.8
 ```bash
-sudo apt install cuda-12-3 -y
+sudo apt install cuda-11-8 -y
 ```
 - Setup your paths
 ```bash
-echo 'export PATH=/usr/local/cuda-12.3/bin:$PATH' >> ~/.bashrc
-echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export PATH=/usr/local/cuda-11.8/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
 sudo ldconfig
 ```
-- Install cuDNN 8.9 - First register here: https://developer.nvidia.com/developer-program/signup
+- Install cuDNN 8.6 - Follow the link here: https://developer.nvidia.com/rdp/cudnn-archive, then sign up to download
 ```bash
-CUDNN_TAR_FILE="cudnn-linux-x86_64-8.9.0.131_cuda12-archive.tar.xz"
+CUDNN_TAR_FILE="cudnn-linux-x86_64-8.6.0.163_cuda11-archive.tar.xz"
 sudo tar -xvf ${CUDNN_TAR_FILE}
-sudo mv cudnn-linux-x86_64-8.9.0.131_cuda12-archive cuda
+sudo mv cudnn-linux-x86_64-8.6.0.163_cuda11-archive cuda
 ```
 - Copy the following files into the cuda toolkit directory.
 ```bash
-sudo cp -P cuda/include/cudnn.h /usr/local/cuda-12.3/include
-sudo cp -P cuda/lib/libcudnn* /usr/local/cuda-12.3/lib64/
-sudo chmod a+r /usr/local/cuda-12.3/lib64/libcudnn*
+sudo cp -P cuda/include/cudnn.h /usr/local/cuda-11.8/include
+sudo cp -P cuda/lib/libcudnn* /usr/local/cuda-11.8/lib64/
+sudo chmod a+r /usr/local/cuda-11.8/lib64/libcudnn*
 ```
 - Finally, to verify the installation, check
 ```bash
@@ -114,7 +114,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo docker run hello-world
 ```
 
-# II. Convert model and Compare with .h5 version
+# II. Convert model
 ### Convert model
 ```python
 import os
@@ -214,12 +214,12 @@ We can have multiple versions of model on TFServer.
 ### 1. Load docker image
 - Pull docker
 ```bash
-docker pull tensorflow/serving:2.16.1
+docker pull tensorflow/serving:2.13.1
 ```
 - Run image (init container)
 ```bash
-sudo docker run --name=tf-gpu2 -it --entrypoint=/bin/bash tensorflow/serving:2.16.1
-sudo docker start -i tf-gpu2
+sudo docker run --name=tf-qrs -it --entrypoint=/bin/bash tensorflow/serving:2.13.1
+sudo docker start -i tf-qrs
 ```
 - Create folder
 ```bash
@@ -262,7 +262,7 @@ EOL
 
 - Copy to TFServer
 ```bash
-sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new/1 tf-gpu2:/tensorflow-serving/qrs_model
+sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new/1 tf-qrs:/tensorflow-serving/qrs_model
 ```
 - Start server
 ```bash
@@ -336,10 +336,8 @@ tensor_shape {
 float_val: 1
 float_val: 5.79103667e-19
 ```
-
 |  | % QRS sensitivity | % QRS positive predictivity |
 |:------------:|:------------:|:------------:|
 | Model `h5` | 99.43 | 99.90 |
 | SavedModel | 99.43 | 99.90 |
 - The result in table above is calculated by EC57, we can see that the performance of two methods are the same.
-
