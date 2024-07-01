@@ -1,15 +1,15 @@
 # I. Setup environment
 ### 1. Install libraries
-- Install tensorflow 2.16.1
+- Install tensorflow 2.13.1
 ```bash
-pip install tensorflow==2.16.1
+pip install tensorflow==2.13.1
 pip install tensorflow-serving-api
 ```
 - Install grpc
 ```bash
 pip install grpcio
 ```
-### 2. Install CUDA 12.3 and CUDNN 8.9
+### 2. Install CUDA 11.8 and CUDNN 8.6
 - To verify your gpu is cuda enable check
 ```bash
 lspci | grep -i nvidia
@@ -59,28 +59,28 @@ sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
-- Installing CUDA-12.3
+- Installing CUDA-11.8
 ```bash
-sudo apt install cuda-12-3 -y
+sudo apt install cuda-11-8 -y
 ```
 - Setup your paths
 ```bash
-echo 'export PATH=/usr/local/cuda-12.3/bin:$PATH' >> ~/.bashrc
-echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export PATH=/usr/local/cuda-11.8/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 source ~/.bashrc
 sudo ldconfig
 ```
-- Install cuDNN 8.9 - First register here: https://developer.nvidia.com/developer-program/signup
+- Install cuDNN 8.6 - Follow the link here: https://developer.nvidia.com/rdp/cudnn-archive, then sign up to download
 ```bash
-CUDNN_TAR_FILE="cudnn-linux-x86_64-8.9.0.131_cuda12-archive.tar.xz"
+CUDNN_TAR_FILE="cudnn-linux-x86_64-8.6.0.163_cuda11-archive.tar.xz"
 sudo tar -xvf ${CUDNN_TAR_FILE}
-sudo mv cudnn-linux-x86_64-8.9.0.131_cuda12-archive cuda
+sudo mv cudnn-linux-x86_64-8.6.0.163_cuda11-archive cuda
 ```
 - Copy the following files into the cuda toolkit directory.
 ```bash
-sudo cp -P cuda/include/cudnn.h /usr/local/cuda-12.3/include
-sudo cp -P cuda/lib/libcudnn* /usr/local/cuda-12.3/lib64/
-sudo chmod a+r /usr/local/cuda-12.3/lib64/libcudnn*
+sudo cp -P cuda/include/cudnn.h /usr/local/cuda-11.8/include
+sudo cp -P cuda/lib/libcudnn* /usr/local/cuda-11.8/lib64/
+sudo chmod a+r /usr/local/cuda-11.8/lib64/libcudnn*
 ```
 - Finally, to verify the installation, check
 ```bash
