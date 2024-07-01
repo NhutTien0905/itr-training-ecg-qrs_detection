@@ -214,12 +214,12 @@ We can have multiple versions of model on TFServer.
 ### 1. Load docker image
 - Pull docker
 ```bash
-docker pull tensorflow/serving:2.16.1
+docker pull tensorflow/serving:2.13.1
 ```
 - Run image (init container)
 ```bash
-sudo docker run --name=tf-gpu2 -it --entrypoint=/bin/bash tensorflow/serving:2.16.1
-sudo docker start -i tf-gpu2
+sudo docker run --name=tf-qrs -it --entrypoint=/bin/bash tensorflow/serving:2.13.1
+sudo docker start -i tf-qrs
 ```
 - Create folder
 ```bash
@@ -284,10 +284,6 @@ import numpy as np
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
 
-# Ensure compatibility with TensorFlow 1.x API
-tf.compat.v1.disable_eager_execution()
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-
 # Set visible devices to CPU only
 tf.config.set_visible_devices([], 'GPU')
 
@@ -321,9 +317,7 @@ def grpc_infer(imgs):
 MITDB_DIR = '/home/tien/Documents/ITR/mit-bih-arrhythmia-database-1.0.0/'
 test_data, _ = preprocess_data(MITDB_DIR + '100.hea')
 
-with tf.compat.v1.Session() as sess:
-    sess.run(tf.compat.v1.global_variables_initializer())
-    y_pred = grpc_infer(test_data)
+y_pred = grpc_infer(test_data[:3, :, :])
 
 print(y_pred)
 ```
