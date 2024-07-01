@@ -321,3 +321,25 @@ y_pred = grpc_infer(test_data[:3, :, :])
 
 print(y_pred)
 ```
+# IV. Analyze result
+- Average inference time: 3ms
+
+- Output:
+```bash
+dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 1
+  }
+  dim {
+    size: 2
+  }
+}
+float_val: 1
+float_val: 5.79103667e-19
+```
+|  | % QRS sensitivity | % QRS positive predictivity |
+|:------------:|:------------:|:------------:|
+| Model `h5` | 99.43 | 99.90 |
+| SavedModel | 99.43 | 99.90 |
+- The result in table above is calculated by EC57, we can see that the performance of two methods are the same.
