@@ -320,7 +320,7 @@ y_pred = grpc_infer(test_data[:1,:,:])
 print(y_pred)
 ```
 # IV. Analyze result
-- Average inference time: 3ms
+- Average inference time: 3 ms/sample
 
 - Output:
 ```bash
@@ -336,6 +336,12 @@ tensor_shape {
 float_val: 1
 float_val: 5.79103667e-19
 ```
+`dtype: DT_FLOAT`: The data type of the tensor is a floating-point number.
+
+`tensor_shape`: Tensor output has dimension (1,2).
+
+`float_val`: Values of tensor output.
+
 |  | % QRS sensitivity | % QRS positive predictivity |
 |:------------:|:------------:|:------------:|
 | Model `h5` | 99.43 | 99.90 |
