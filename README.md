@@ -70,7 +70,7 @@ echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:$LD_LIBRARY_PATH' >> ~/.
 source ~/.bashrc
 sudo ldconfig
 ```
-- Install cuDNN 8.6 - Follow the link here: https://developer.nvidia.com/rdp/cudnn-archive, then sign up to download
+- Install cuDNN 8.6 - Follow the link [here](https://developer.nvidia.com/rdp/cudnn-archive), then sign up to download.
 ```bash
 CUDNN_TAR_FILE="cudnn-linux-x86_64-8.6.0.163_cuda11-archive.tar.xz"
 sudo tar -xvf ${CUDNN_TAR_FILE}
@@ -87,7 +87,16 @@ sudo chmod a+r /usr/local/cuda-11.8/lib64/libcudnn*
 nvidia-smi
 nvcc -V
 ```
-### 3. Install NVIDIA Container Toolkit
+### 3. Install Docker
+- Install lastest version
+```bash
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+- Check installation
+```bash
+sudo docker run hello-world
+```
+### 4. Install NVIDIA Container Toolkit, follow this [link](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/1.13.5/install-guide.html).
 - Update and install
 ```bash
 sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit-base
@@ -104,14 +113,29 @@ sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
 ```bash
 grep "  name:" /etc/cdi/nvidia.yaml
 ```
-### 4. Install Docker
-- Install lastest version
+- Setup the package repository and the GPG key
 ```bash
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+      && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+      && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 ```
-- Check installation
+- Install the `nvidia-container-toolkit` package (and dependencies) after updating the package listing.
 ```bash
-sudo docker run hello-world
+sudo apt-get update
+```
+In this step, If you get this error like below, follow this [link](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/troubleshooting.html#conflicting-values-set-for-option-signed-by-error-when-running-apt-update). If not, go to next step.
+```bash
+sudo apt-get install -y nvidia-container-toolkit
+```
+- Configure the Docker daemon to recognize the NVIDIA Container Runtime.
+```bash
+sudo nvidia-ctk runtime configure --runtime=docker
+```
+- Restart the Docker daemon to complete the installation after setting the default runtime.
+```bash
+sudo systemctl restart docker
 ```
 
 # II. Convert model
