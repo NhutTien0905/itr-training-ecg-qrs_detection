@@ -245,7 +245,7 @@ In `model_config.txt`, We define model's name, path to model in Docker container
 
 ```bash
 touch batching_parameters.txt
-cat > batching_parameters << EOL
+cat > batching_parameters.txt << EOL
 max_batch_size { value: 1024 }
 batch_timeout_micros { value: 1000 }
 num_batch_threads { value: 12 }
@@ -320,9 +320,12 @@ y_pred = grpc_infer(test_data[:1,:,:])
 print(y_pred)
 ```
 # IV. Analyze result
-- Average inference time: 3 ms/sample
+Three experiments below use maximum request followed `batching_parameter.txt` (input shape = (1024, 145, 1)):
+- Average inference time on TFServer using CPU: 90 ms
+- Average inference time on TFServer using GPU: 10 ms
+- Average inference time by `load_model` on GPU: 360 ms
 
-- Output:
+Output:
 ```bash
 dtype: DT_FLOAT
 tensor_shape {
@@ -346,4 +349,4 @@ float_val: 5.79103667e-19
 |:------------:|:------------:|:------------:|
 | Model `h5` | 99.43 | 99.90 |
 | SavedModel | 99.43 | 99.90 |
-- The result in table above is calculated by EC57, we can see that the performance of two methods are the same.
+The result in table above is calculated by EC57, we can see that the performance of two methods are the same.
