@@ -318,7 +318,7 @@ from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
 
 # Set visible devices to CPU only
-tf.config.set_visible_devices([], 'GPU')
+# tf.config.set_visible_devices([], 'GPU')
 
 # Establish gRPC channel
 channel = grpc.insecure_channel("172.17.0.2:9000")
@@ -356,11 +356,6 @@ print(y_pred)
 ```
 
 # IV. Analyze result
-Three experiments below use maximum request followed `batching_parameter.txt` (input shape = (1024, 145, 1)):
-- Average inference time on TFServer using CPU: 90 ms
-- Average inference time on TFServer using GPU: 10 ms
-- Average inference time by `load_model` on GPU: 360 ms
-
 Output structure:
 ```bash
 dtype: DT_FLOAT
@@ -375,6 +370,15 @@ tensor_shape {
 float_val: 1
 float_val: 5.79103667e-19
 ```
+
+| Shape | (1. 145, 1) | (100, 145, 1) | (1000, 145, 1) |
+|----------|----------|----------|----------|
+| Local CPU | 350 ms | 670 ms | 970 ms |
+| Local GPU | 165 ms | 180 ms | 245 ms |
+| TFServer CPU | 3.5 ms | 5.6 ms | 27 ms |
+| TFServer GPU | 2.6 ms | 3.5 ms | 11 ms |
+
+
 `dtype: DT_FLOAT`: The data type of the tensor is a floating-point number.
 
 `tensor_shape`: Tensor output has dimension (1,2).
@@ -385,4 +389,5 @@ float_val: 5.79103667e-19
 |:------------:|:------------:|:------------:|
 | Model `h5` | 99.43 | 99.90 |
 | SavedModel | 99.43 | 99.90 |
+
 The result in table above is calculated by EC57, we can see that the performance of two methods are the same.
