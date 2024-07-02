@@ -267,8 +267,6 @@ mkdir qrs_model
 ```
 - Create dependence files
 ```bash
-cd ..
-touch model_config.txt
 cat > model_config.txt << EOL
 model_config_list: {
   config: {
@@ -282,7 +280,6 @@ EOL
 In `model_config.txt`, We define model's name, path to model in Docker container, and framework we are using.
 
 ```bash
-touch batching_parameters.txt
 cat > batching_parameters.txt << EOL
 max_batch_size { value: 1024 }
 batch_timeout_micros { value: 1000 }
@@ -298,11 +295,11 @@ EOL
 
 `pad_variable_length_inputs: true`: This indicates whether variable-length inputs should be padded to ensure they have the same length within a batch.
 
-- Copy to TFServer
+- Copy to TFServer (open another terminal to do this).
 ```bash
 sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new_2/1 tf-qrs2:/tensorflow-serving/qrs_model
 ```
-- Start server
+- Start server (run in container).
 ```bash
 tensorflow_model_server --port=9000 --model_config_file=/tensorflow-serving/model_config.txt --file_system_poll_wait_seconds=86400 --enable_batching=true --batching_parameters_file=/tensorflow-serving/batching_parameters.txt
 ```
@@ -357,13 +354,14 @@ y_pred = grpc_infer(test_data[:1,:,:])
 
 print(y_pred)
 ```
+
 # IV. Analyze result
 Three experiments below use maximum request followed `batching_parameter.txt` (input shape = (1024, 145, 1)):
 - Average inference time on TFServer using CPU: 90 ms
 - Average inference time on TFServer using GPU: 10 ms
 - Average inference time by `load_model` on GPU: 360 ms
 
-Output:
+Output structure:
 ```bash
 dtype: DT_FLOAT
 tensor_shape {
