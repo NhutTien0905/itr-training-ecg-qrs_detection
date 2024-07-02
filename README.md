@@ -1,5 +1,9 @@
 # I. Setup environment
-### 1. Install libraries
+### 1. Check Python version
+```bash
+python3 -V
+```
+### 2. Install libraries
 - Install tensorflow 2.13.1
 ```bash
 pip install tensorflow==2.13.1
@@ -9,7 +13,7 @@ pip install tensorflow-serving-api
 ```bash
 pip install grpcio
 ```
-### 2. Install CUDA 11.8 and CUDNN 8.6
+### 3. Install CUDA 11.8 and CUDNN 8.6
 - To verify your gpu is cuda enable check
 ```bash
 lspci | grep -i nvidia
@@ -87,7 +91,7 @@ sudo chmod a+r /usr/local/cuda-11.8/lib64/libcudnn*
 nvidia-smi
 nvcc -V
 ```
-### 3. Install Docker
+### 4. Install Docker
 - Install lastest version
 ```bash
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -96,7 +100,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 ```bash
 sudo docker run hello-world
 ```
-### 4. Install NVIDIA Container Toolkit, follow this [link](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/1.13.5/install-guide.html).
+### 5. Install NVIDIA Container Toolkit, follow this [link](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/1.13.5/install-guide.html).
 - Update and install
 ```bash
 sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit-base
@@ -121,11 +125,17 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
             sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
             sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 ```
-- Install the `nvidia-container-toolkit` package (and dependencies) after updating the package listing.
+- Update
 ```bash
 sudo apt-get update
 ```
-In this step, If you get this error like below, follow this [link](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/troubleshooting.html#conflicting-values-set-for-option-signed-by-error-when-running-apt-update). If not, go to next step.
+In this step, If you get this error as below, follow this [link](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/troubleshooting.html#conflicting-values-set-for-option-signed-by-error-when-running-apt-update). If not, go to next step.
+```bash
+sudo apt-get update
+E: Conflicting values set for option Signed-By regarding source https://nvidia.github.io/libnvidia-container/stable/ubuntu18.04/amd64/ /: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg !=
+E: The list of sources could not be read.
+```
+- Install the `nvidia-container-toolkit` package (and dependencies) after updating the package listing.
 ```bash
 sudo apt-get install -y nvidia-container-toolkit
 ```
@@ -236,14 +246,18 @@ We can have multiple versions of model on TFServer.
 
 # III. Import model
 ### 1. Load docker image
+These steps below are for using GPU, If you want to use on CPU, replacing `tensorflow/serving:2.13.1-gpu` by `tensorflow/serving:2.13.1`.
 - Pull docker
 ```bash
-docker pull tensorflow/serving:2.13.1
+docker pull tensorflow/serving:2.13.1-gpu
 ```
 - Run image (init container)
 ```bash
-sudo docker run --name=tf-qrs -it --entrypoint=/bin/bash tensorflow/serving:2.13.1
-sudo docker start -i tf-qrs
+sudo docker run --runtime=nvidia --name=tf-qrs2 -it --entrypoint=/bin/bash tensorflow/serving:2.13.1-gpu
+```
+- Next times, only use this command to start container.
+```bash
+sudo docker start -i tf-qrs2
 ```
 - Create folder
 ```bash
@@ -286,16 +300,16 @@ EOL
 
 - Copy to TFServer
 ```bash
-sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new/1 tf-qrs:/tensorflow-serving/qrs_model
+sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new_2/1 tf-qrs2:/tensorflow-serving/qrs_model
 ```
 - Start server
 ```bash
-tensorflow_model_server --port=9000 --model_config_file=/tensorflow-serving/model_config.txt
+tensorflow_model_server --port=9000 --model_config_file=/tensorflow-serving/model_config.txt --file_system_poll_wait_seconds=86400 --enable_batching=true --batching_parameters_file=/tensorflow-serving/batching_parameters.txt
 ```
 ### 2. Use server
 - Check configuration of converted model
 ```bash
-saved_model_cli show --dir /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new/1 --all
+saved_model_cli show --dir /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new_2/1 --all
 ```
 - Python code
 ```python
