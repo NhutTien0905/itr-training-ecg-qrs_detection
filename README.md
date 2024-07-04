@@ -377,6 +377,7 @@ Simplify prediction API by using necessary `.proto` files follow this [link](htt
 
 - Clone the [`tensorflow/tensorflow`](https://github.com/tensorflow/tensorflow) and [`tensorflow/serving`](https://github.com/tensorflow/serving) repositories and copy the following protobuf files into the client project. Then copy these protobuf files into a `protos/`.
 
+```text
 - tensorflow/serving/  
   - tensorflow_serving/apis/model.proto
   - tensorflow_serving/apis/predict.proto
@@ -387,6 +388,7 @@ Simplify prediction API by using necessary `.proto` files follow this [link](htt
   - tensorflow/core/framework/tensor_shape.proto
   - tensorflow/core/framework/tensor.proto
   - tensorflow/core/framework/types.proto
+```
 
 Result as below:
 
