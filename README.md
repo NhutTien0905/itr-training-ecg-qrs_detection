@@ -13,6 +13,14 @@ pip install tensorflow-serving-api
 ```bash
 pip install grpcio
 ```
+- Install scipy 1.12.0. Do this step first to make sure that you won't get any error when running `wfdb` library.
+```bash
+pip install scipy==1.12.0
+```
+- Install wfdb
+```bash
+pip install wfdb
+```
 ### 3. Install CUDA 11.8 and CUDNN 8.6
 - To verify your gpu is cuda enable check
 ```bash
@@ -244,7 +252,7 @@ After run this code, we will have a folder like this:
 
 We can have multiple versions of model on TFServer.
 
-# III. Import model
+# III. Serving model
 ### 1. Load docker image
 These steps below are for using GPU, If you want to use on CPU, replacing `tensorflow/serving:2.13.1-gpu` by `tensorflow/serving:2.13.1`.
 - Pull docker
@@ -303,7 +311,7 @@ sudo docker cp /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new
 ```bash
 tensorflow_model_server --port=9000 --model_config_file=/tensorflow-serving/model_config.txt --file_system_poll_wait_seconds=86400 --enable_batching=true --batching_parameters_file=/tensorflow-serving/batching_parameters.txt
 ```
-### 2. Use server
+### 2. Client with tensorflow
 - Check configuration of converted model
 ```bash
 saved_model_cli show --dir /home/tien/Documents/ITR/itr-training-ecg-qrs_detection/model_new_2/1 --all
@@ -354,6 +362,18 @@ y_pred = grpc_infer(test_data[:1,:,:])
 
 print(y_pred)
 ```
+### 3. Client without tensorflow
+This step does not need to use `tensorflow` and `tensorflow-serving-api`. To simplify, create new virtual environment.
+- Create new virtual environment.
+```bash
+sudo apt update
+sudo apt install python3 python3-venv
+python3 -m venv <env_name>
+source <env_name>/bin/activate
+```
+- Install libraries follow part I.1, except installing `tensorflow` and `tensorflow-serving-api`.
+Simplify prediction API by using necessary `.proto` files follow this [link](https://www.mux.com/blog/tuning-performance-of-tensorflow-serving-pipeline#improving-speed-on-prediction-client).
+- Clone the [`tensorflow/tensorflow`](https://github.com/tensorflow/tensorflow) and [`tensorflow/serving`](https://github.com/tensorflow/serving)
 
 # IV. Analyze result
 Output structure:
