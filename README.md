@@ -372,10 +372,8 @@ python3 -m venv <env_name>
 source <env_name>/bin/activate
 ```
 - Install libraries follow part I.1, except installing `tensorflow` and `tensorflow-serving-api`.
-
-Simplify prediction API by using necessary `.proto` files follow this [link](https://www.mux.com/blog/tuning-performance-of-tensorflow-serving-pipeline#improving-speed-on-prediction-client).
-
-- Clone the [`tensorflow/tensorflow`](https://github.com/tensorflow/tensorflow) and [`tensorflow/serving`](https://github.com/tensorflow/serving) repositories and copy the following protobuf files into the client project. Then copy these protobuf files into a `protos/`.
+-
+- Simplify prediction API by using necessary `.proto` files follow this [link](https://www.mux.com/blog/tuning-performance-of-tensorflow-serving-pipeline#improving-speed-on-prediction-client). Clone the [`tensorflow/tensorflow`](https://github.com/tensorflow/tensorflow) and [`tensorflow/serving`](https://github.com/tensorflow/serving) repositories and copy the following protobuf files into the client project. Then copy these protobuf files into a `protos/`.
 
 ```text
 - tensorflow/serving/  
