@@ -362,6 +362,26 @@ y_pred = grpc_infer(test_data[:1,:,:])
 
 print(y_pred)
 ```
+- Output structure:
+```bash
+dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 1
+  }
+  dim {
+    size: 2
+  }
+}
+float_val: 1
+float_val: 5.79103667e-19
+```
+`dtype: DT_FLOAT`: The data type of the tensor is a floating-point number.
+
+`tensor_shape`: Tensor output has dimension (1,2).
+
+`float_val`: Values of tensor output.
+
 ### 3. Client without tensorflow
 This step does not need to use `tensorflow` and `tensorflow-serving-api`. To simplify, create new virtual environment.
 - Create new virtual environment.
@@ -399,27 +419,93 @@ Result as below:
       - framework/
         - *.proto
 
+- Generate the gRPC python implementations using `grpcio.tools.protoc`.
+```bash
+PROTOC_OUT=protos/  
+PROTOS=$(find . | grep "\.proto$")  
+for p in $PROTOS; do  
+  python -m grpc.tools.protoc -I . --python_out=$PROTOC_OUT --grpc_python_out=$PROTOC_OUT $p
+done  
+```
+Result as below:
+
+- protos/  
+  - tensorflow_serving/
+    - apis/
+      - *_pb2.py
+      - *_grpc_pb2.py
+  - tensorflow/
+    - core/
+      - framework/
+        - *_pb2.py
+        - *_grpc_pb2.py
+
+Go to `protos/` and create your client like this:
+
+- protos/
+  - client.py
+  - tensorflow_serving/
+    - apis/
+      - *_pb2.py
+      - *_grpc_pb2.py
+  - tensorflow/
+    - core/
+      - framework/
+        - *_pb2.py
+        - *_grpc_pb2.py
+
+```python
+import grpc
+import numpy as np
+from tensorflow.core.framework import tensor_pb2
+from tensorflow.core.framework import tensor_shape_pb2
+from tensorflow.core.framework import types_pb2
+from tensorflow_serving.apis import predict_pb2
+from tensorflow_serving.apis import prediction_service_pb2_grpc
+
+# Establish gRPC channel
+channel = grpc.insecure_channel("172.17.0.2:9000")
+grpc.channel_ready_future(channel).result(timeout=10)
+print("Connected to gRPC server")
+
+# Create gRPC stub
+stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
+
+# Create PredictRequest
+request = predict_pb2.PredictRequest()
+request.model_spec.name = "qrs"
+request.model_spec.signature_name = "channels"
+
+def grpc_infer(imgs):
+    # ensure NHWC shape and build tensor proto
+    tensor_shape = list(imgs.shape)
+    dims = [tensor_shape_pb2.TensorShapeProto.Dim(size=dim) for dim in tensor_shape]
+    tensor_shape = tensor_shape_pb2.TensorShapeProto(dim=dims)
+    tensor = tensor_pb2.TensorProto(
+                dtype=types_pb2.DT_FLOAT,
+                tensor_shape=tensor_shape,
+                float_val=list(imgs.reshape(-1)))
+    request.inputs['input'].CopyFrom(tensor)
+
+    try:
+        result = stub.Predict(request, 30.0)
+        result = result.outputs["prediction"]
+        return result
+    except Exception as e:
+        print(f"Error during inference: {e}")
+        return None
+
+# Preprocess data
+test_data = np.zeros((1, 145, 1)).astype(np.float32)
+y_pred = grpc_infer(test_data[:1, :, :])
+print(y_pred)
+```
+- Output structure:
+```bash
+
+```
 
 # IV. Analyze result
-Output structure:
-```bash
-dtype: DT_FLOAT
-tensor_shape {
-  dim {
-    size: 1
-  }
-  dim {
-    size: 2
-  }
-}
-float_val: 1
-float_val: 5.79103667e-19
-```
-`dtype: DT_FLOAT`: The data type of the tensor is a floating-point number.
-
-`tensor_shape`: Tensor output has dimension (1,2).
-
-`float_val`: Values of tensor output.
 
 | Shape | (1. 145, 1) | (100, 145, 1) | (1000, 145, 1) |
 |----------|----------|----------|----------|
