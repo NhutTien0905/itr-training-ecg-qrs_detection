@@ -238,6 +238,20 @@ After run this code, we will have a folder like this:
         - variables.index
   - .../
 
+project/
+├── src/
+│ ├── main.py
+│ ├── utils.py
+│ └── config/
+│ ├── config.yaml
+│ └── secrets.yaml
+├── tests/
+│ ├── test_main.py
+│ └── test_utils.py
+├── .gitignore
+├── README.md
+└── requirements.txt
+
 `assets`: This directory is used to store auxiliary files. These could be any additional assets required by the model, such as vocabularies, label maps, or external files needed during the model's inference.
 
 `saved_model.pb`: This is the protobuf file that contains the actual TensorFlow model. It includes the model architecture, training configuration, and other metadata.
