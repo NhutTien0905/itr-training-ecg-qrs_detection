@@ -446,7 +446,7 @@ protos/
             └── *_grpc_pb2.py
 ```
 
-Go to `protos/` and create your client like this:
+- Go to `protos/` and create your client like this:
 
 ```bash
 protos/
@@ -508,9 +508,19 @@ test_data = np.zeros((1, 145, 1)).astype(np.float32)
 y_pred = grpc_infer(test_data[:1, :, :])
 print(y_pred)
 ```
-- Output structure:
+- Output structure like part III.2:
 ```bash
-
+dtype: DT_FLOAT
+tensor_shape {
+  dim {
+    size: 1
+  }
+  dim {
+    size: 2
+  }
+}
+float_val: 1
+float_val: 7.8670577e-13
 ```
 
 # IV. Analyze result
@@ -521,6 +531,7 @@ print(y_pred)
 | Local GPU | 165 ms | 180 ms | 245 ms |
 | TFServer CPU | 3.5 ms | 5.6 ms | 27 ms |
 | TFServer GPU | 2.6 ms | 3.5 ms | 11 ms |
+| Proto files | 2 ms | 5.5 ms | 40 ms |
 
 Overall, inference using TFServer is faster than on local machine in both environments CPU and GPU. When using GPU or CPU, TFServer is faster than local machine approximately 20 times (follow the table above). 
 
