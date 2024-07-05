@@ -237,7 +237,7 @@ After run this code, we will have a folder like this:
         - variables.data-00000-of-00001
         - variables.index
   - .../
-
+```bash
 project/
 ├── src/
 │ ├── main.py
@@ -251,6 +251,7 @@ project/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+```
 
 `assets`: This directory is used to store auxiliary files. These could be any additional assets required by the model, such as vocabularies, label maps, or external files needed during the model's inference.
 
