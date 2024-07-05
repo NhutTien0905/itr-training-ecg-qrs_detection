@@ -228,29 +228,15 @@ TF_CONFIG = {
 `output: prediction`: This specifies the name of the output node or tensor for the model. The model will provide its predictions under the name `prediction`.
 
 After run this code, we will have a folder like this:
-- save/model/path/
-  - 1/
-    - assets/
-    - saved_model.pb
-    - fingerprint.pb
-    - variables/
-        - variables.data-00000-of-00001
-        - variables.index
-  - .../
 ```bash
-project/
-├── src/
-│ ├── main.py
-│ ├── utils.py
-│ └── config/
-│ ├── config.yaml
-│ └── secrets.yaml
-├── tests/
-│ ├── test_main.py
-│ └── test_utils.py
-├── .gitignore
-├── README.md
-└── requirements.txt
+save/model/path/
+└── 1/
+    ├── assets/
+    ├── saved_model.pb
+    ├── fingerprint.pb
+    └── variables/
+          ├── variables.data-00000-of-00001
+          └── variables.index
 ```
 
 `assets`: This directory is used to store auxiliary files. These could be any additional assets required by the model, such as vocabularies, label maps, or external files needed during the model's inference.
@@ -410,29 +396,32 @@ source <env_name>/bin/activate
 
 - Simplify prediction API by using necessary `.proto` files follow this [link](https://www.mux.com/blog/tuning-performance-of-tensorflow-serving-pipeline#improving-speed-on-prediction-client). Clone the [`tensorflow/tensorflow`](https://github.com/tensorflow/tensorflow) and [`tensorflow/serving`](https://github.com/tensorflow/serving) repositories and copy the following protobuf files into the client project. Then copy these protobuf files into a `protos/`.
 
-```text
-- tensorflow/serving/  
-  - tensorflow_serving/apis/model.proto
-  - tensorflow_serving/apis/predict.proto
-  - tensorflow_serving/apis/prediction_service.proto
+```bash
+tensorflow/serving/
+├── tensorflow_serving/apis/model.proto
+├── tensorflow_serving/apis/predict.proto
+└── tensorflow_serving/apis/prediction_service.proto
 
-- tensorflow/tensorflow/  
-  - tensorflow/core/framework/resource_handle.proto
-  - tensorflow/core/framework/tensor_shape.proto
-  - tensorflow/core/framework/tensor.proto
-  - tensorflow/core/framework/types.proto
+tensorflow/tensorflow/
+├── tensorflow/core/framework/resource_handle.proto
+├── tensorflow/core/framework/tensor_shape.proto
+├── tensorflow/core/framework/tensor.proto
+└── tensorflow/core/framework/types.proto
 ```
 
 Result as below:
 
-- protos/  
-  - tensorflow_serving/
-    - apis/
-      - *.proto
-  - tensorflow/
-    - core/
-      - framework/
-        - *.proto
+```bash
+protos/
+├── client.py
+├── tensorflow_serving/
+│   └── apis/
+│       └── *.proto
+└── tensorflow/
+    └── core/
+        └── framework/
+            └── *.proto
+```
 
 - Generate the gRPC python implementations using `grpcio.tools.protoc`.
 ```bash
@@ -444,30 +433,34 @@ done
 ```
 Result as below:
 
-- protos/  
-  - tensorflow_serving/
-    - apis/
-      - *_pb2.py
-      - *_grpc_pb2.py
-  - tensorflow/
-    - core/
-      - framework/
-        - *_pb2.py
-        - *_grpc_pb2.py
+```bash
+protos/
+├── tensorflow_serving/
+│   └── apis/
+│       ├── *_pb2.py
+│       └── *_grpc_pb2.py
+└── tensorflow/
+    └── core/
+        └── framework/
+            ├── *_pb2.py
+            └── *_grpc_pb2.py
+```
 
 Go to `protos/` and create your client like this:
 
-- protos/
-  - client.py
-  - tensorflow_serving/
-    - apis/
-      - *_pb2.py
-      - *_grpc_pb2.py
-  - tensorflow/
-    - core/
-      - framework/
-        - *_pb2.py
-        - *_grpc_pb2.py
+```bash
+protos/
+├── client.py
+├── tensorflow_serving/
+│   └── apis/
+│       ├── *_pb2.py
+│       └── *_grpc_pb2.py
+└── tensorflow/
+    └── core/
+        └── framework/
+            ├── *_pb2.py
+            └── *_grpc_pb2.py
+```
 
 ```python
 import grpc
