@@ -235,8 +235,8 @@ save/model/path/
     ├── saved_model.pb
     ├── fingerprint.pb
     └── variables/
-          ├── variables.data-00000-of-00001
-          └── variables.index
+        ├── variables.data-00000-of-00001
+        └── variables.index
 ```
 
 `assets`: This directory is used to store auxiliary files. These could be any additional assets required by the model, such as vocabularies, label maps, or external files needed during the model's inference.
@@ -462,6 +462,8 @@ protos/
             └── *_grpc_pb2.py
 ```
 
+- Python code `client.py`
+
 ```python
 import grpc
 import numpy as np
@@ -533,7 +535,7 @@ float_val: 7.8670577e-13
 | TFServer GPU | 2.6 ms | 3.5 ms | 11 ms |
 | Proto files | 2 ms | 5.5 ms | 40 ms |
 
-Overall, inference using TFServer is faster than on local machine in both environments CPU and GPU. When using GPU or CPU, TFServer is faster than local machine approximately 20 times (follow the table above). 
+Overall, inference using TFServer is faster than on local machine in both environments CPU and GPU. When using GPU or CPU, TFServer is faster than local machine approximately 20 times (follow the table above). When using custom proto files, we have a trade off between performance and installation. Our work will work on CPU but we do not need to install a whole tensorflow and tensorflow-serving-api packages on client device.
 
 |  | % QRS sensitivity | % QRS positive predictivity |
 |:------------:|:------------:|:------------:|
