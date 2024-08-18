@@ -1,0 +1,7 @@
+model_config_list: {
+  config: {
+    name: "qrs",
+    base_path: "/tensorflow-serving/qrs_model",
+    model_platform: "tensorflow"
+  }
+}
